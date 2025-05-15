@@ -1,0 +1,224 @@
+tags:
+  - name: Property
+    description: Operations related to domain propery-based properties
+
+paths:
+  /api/v2/property:
+    post:
+      summary: Create a new property
+      tags: [Property]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePropertyInput"
+      responses:
+        201:
+          description: Property created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PropertyResponse"
+        400:
+          description: domain and user are required. / Invalid domain format. Use a valid domain like 'app.example.com'.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        403:
+          description: This domain is registered before. Please use the previous login for it.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/v2/property/all/{userId}:
+    get:
+      summary: Get all properties for a user
+      tags: [Property]
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+          description: MongoDB ObjectId of the user
+      responses:
+        200:
+          description: List of properties
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  properties:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Property"
+        500:
+          description: Internal server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/v2/property/{propertyId}:
+    get:
+      summary: Get a single property by its propertyId
+      tags: [Property]
+      parameters:
+        - in: path
+          name: propertyId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Single Property fetched
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PropertyResponse"
+        404:
+          description: No properties found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    put:
+      summary: Update a property's domain
+      tags: [Property]
+      parameters:
+        - in: path
+          name: propertyId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                domain:
+                  type: string
+                  example: updated-example.com
+      responses:
+        200:
+          description: Property updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PropertyResponse"
+        404:
+          description: Property not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    delete:
+      summary: Delete a property by propertyId
+      tags: [Property]
+      parameters:
+        - in: path
+          name: propertyId
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Property deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        404:
+          description: Property not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+components:
+  schemas:
+    CreatePropertyInput:
+      type: object
+      required:
+        - domain
+        - user
+      properties:
+        domain:
+          type: string
+          example: app.example.com
+        user:
+          type: string
+          description: MongoDB ObjectId of the user
+          example: 60b8d8b8f4d76d0f1c8e4d4b
+
+    Property:
+      type: object
+      properties:
+        _id:
+          type: string
+        propertyId:
+          type: string
+        domain:
+          type: string
+        user:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+
+    PropertyResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        property:
+          $ref: "#/components/schemas/Property"
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        error:
+          type: string

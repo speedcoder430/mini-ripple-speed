@@ -1,0 +1,273 @@
+tags:
+  - name: Blocked IP
+    description: Manage IP blocking for specific properties
+
+paths:
+  /api/v2/blocked-ip/block:
+    post:
+      summary: Block an IP for a property
+      tags: [Blocked IP]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BlockIPInput"
+      responses:
+        201:
+          description: IP blocked successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BlockedIPResponse"
+        400:
+          description: Missing required fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        404:
+          description: Property not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        409:
+          description: IP is already blocked for this property
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/v2/blocked-ip/unblock:
+    post:
+      summary: Unblock an IP for a property
+      tags: [Blocked IP]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UnblockIPInput"
+      responses:
+        200:
+          description: IP unblocked successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        400:
+          description: IP and propertyId are required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        404:
+          description: IP is not currently blocked
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/v2/blocked-ip/check:
+    post:
+      summary: Check if the current IP is blocked for a property
+      tags: [Blocked IP]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - propertyId
+              properties:
+                propertyId:
+                  type: string
+      responses:
+        200:
+          description: IP block status returned
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/CheckIPBlocked"
+                  - $ref: "#/components/schemas/CheckIPNotBlocked"
+        400:
+          description: PropertyID is required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/v2/blocked-ip/{propertyId}:
+    get:
+      summary: List all currently blocked IPs for a property
+      tags: [Blocked IP]
+      parameters:
+        - name: propertyId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: List of active blocked IPs
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  blockedIPs:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/BlockedIP"
+        400:
+          description: propertyId is required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        404:
+          description: Property not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+components:
+  schemas:
+    BlockIPInput:
+      type: object
+      required:
+        - ip
+        - reason
+        - propertyId
+        - expiresAt
+        - blockedBy
+      properties:
+        ip:
+          type: string
+          example: "192.168.1.100"
+        reason:
+          type: string
+          example: "Suspicious traffic"
+        propertyId:
+          type: string
+          example: "MR-123abc"
+        blockedBy:
+          type: string
+          example: "60b8d8b8f4d76d0f1c8e4d4b"
+        expiresAt:
+          type: string
+          format: date-time
+          example: "2025-05-01T00:00:00Z"
+
+    UnblockIPInput:
+      type: object
+      required:
+        - ip
+        - propertyId
+      properties:
+        ip:
+          type: string
+          example: "192.168.1.100"
+        propertyId:
+          type: string
+          example: "MR-123abc"
+
+    BlockedIP:
+      type: object
+      properties:
+        ip:
+          type: string
+        reason:
+          type: string
+        propertyId:
+          type: string
+        blockedAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+        isActive:
+          type: boolean
+
+    BlockedIPResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+          example: IP blocked successfully
+        block:
+          $ref: "#/components/schemas/BlockedIP"
+
+    CheckIPBlocked:
+      type: object
+      properties:
+        blocked:
+          type: boolean
+          example: true
+        reason:
+          type: string
+        expiresAt:
+          type: string
+          format: date-time
+        redirectUrl:
+          type: string
+          example: "https://test-miniripple.onrender.com/blocked.html"
+
+    CheckIPNotBlocked:
+      type: object
+      properties:
+        blocked:
+          type: boolean
+          example: false
+
+    MessageResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string

@@ -1,0 +1,37 @@
+import React, { useState } from "react";
+import TabItem from "./TabItem";
+
+function Tabs() {
+    const [activeTab, setActiveTab] = useState(0);
+
+    const tabs = [
+        { label: "Billing History & Invoices", className: "" },
+        { label: "Multi-Factor Authentication (MFA)", className: "min-w-60" },
+        { label: "Login & Security Settings", className: "" },
+        { label: "Payment Methods", className: "" }
+    ];
+
+    const handleTabClick = (index) => {
+        setActiveTab(index);
+    };
+
+    return (
+        <nav
+            className="flex flex-wrap gap-6 items-center px-6 py-5 mt-6 text-base text-blue-800 bg-blue-700 bg-opacity-20 font-['Jost'] max-md:px-5"
+            role="tablist"
+            aria-label="Account settings tabs"
+        >
+            {tabs.map((tab, index) => (
+                <TabItem
+                    key={index}
+                    label={tab.label}
+                    isActive={activeTab === index}
+                    onClick={() => handleTabClick(index)}
+                    className={tab.className}
+                />
+            ))}
+        </nav>
+    );
+}
+
+export default Tabs;

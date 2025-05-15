@@ -1,0 +1,227 @@
+tags:
+  - name: Visitor Logs
+    description: Track and manage website visitor analytics for properties
+
+paths:
+  /api/v2/visitor/track:
+    post:
+      summary: Track a new unique visitor
+      tags: [Visitor Logs]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TrackVisitorInput"
+      responses:
+        201:
+          description: Visitor logged successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VisitorResponse"
+        200:
+          description: Visitor already logged
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        400:
+          description: Missing required fields
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        403:
+          description: Property not registered for this domain
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/v2/visitor/{id}:
+    get:
+      summary: Get visitor log by ID
+      tags: [Visitor Logs]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Visitor log found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VisitorResponse"
+        404:
+          description: Visitor not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /api/v2/visitor/all/{propertyId}:
+    get:
+      summary: Get all visitors for a specific property
+      tags: [Visitor Logs]
+      parameters:
+        - name: propertyId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: List of visitors
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VisitorListResponse"
+        400:
+          description: Property ID is required
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        404:
+          description: Property not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+components:
+  schemas:
+    TrackVisitorInput:
+      type: object
+      required:
+        - visitorId
+        - propertyId
+        - userAgent
+      properties:
+        visitorId:
+          type: string
+          example: "xyz-abc-123"
+        propertyId:
+          type: string
+          example: "MR-12345"
+        domain:
+          type: string
+          example: "example.com"
+        userAgent:
+          type: string
+          example: "Mozilla/5.0 (Windows NT 10.0; Win64; x64)..."
+        screen:
+          type: string
+          example: "1920x1080"
+        language:
+          type: string
+          example: "en-US"
+        timezone:
+          type: string
+          example: "Africa/Addis_Ababa"
+        referrer:
+          type: string
+          example: "https://google.com"
+
+    Visitor:
+      type: object
+      properties:
+        _id:
+          type: string
+        visitorId:
+          type: string
+        propertyId:
+          type: string
+        domain:
+          type: string
+        ip:
+          type: string
+        country:
+          type: string
+        userAgent:
+          type: string
+        browser:
+          type: string
+        os:
+          type: string
+        device:
+          type: string
+        screen:
+          type: string
+        language:
+          type: string
+        timezone:
+          type: string
+        referrer:
+          type: string
+        isBot:
+          type: boolean
+        isVPN:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+
+    VisitorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        visitor:
+          $ref: "#/components/schemas/Visitor"
+
+    VisitorListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        count:
+          type: integer
+          example: 3
+        visitors:
+          type: array
+          items:
+            $ref: "#/components/schemas/Visitor"
+
+    MessageResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: Visitor already logged.
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string

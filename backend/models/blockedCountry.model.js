@@ -1,0 +1,41 @@
+const mongoose = require("mongoose");
+
+const blockedCountrySchema = new mongoose.Schema({
+  propertyId: {
+    type: String,
+    required: true,
+    index: true,
+  },
+  property: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Property",
+    required: true,
+  },
+  countryCode: {
+    type: String,
+    required: true,
+    uppercase: true,
+    trim: true,
+    minlength: 2,
+    maxlength: 2,
+  },
+  reason: String,
+  blockedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "user",
+    required: true,
+  },
+  isActive: {
+    type: Boolean,
+    default: true,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
+// Unique per property + country combination
+blockedCountrySchema.index({ countryCode: 1, propertyId: 1 }, { unique: true });
+
+module.exports = mongoose.model("BlockedCountry", blockedCountrySchema);
