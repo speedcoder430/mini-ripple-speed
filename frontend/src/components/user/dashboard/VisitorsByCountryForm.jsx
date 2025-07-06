@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Users } from "lucide-react";
+import useVisitorsByCountry from "./useVisitorsByCountry";
 
-const getFlagUrl = (code) =>
-  `https://flagcdn.com/w40/${code.toLowerCase()}.png`;
+const getFlagUrl = (code) => `https://flagcdn.com/w40/${code.toLowerCase()}.png`;
 
 const countryCodeMap = {
   "united states": "us",
@@ -21,18 +20,8 @@ const countryCodeMap = {
   unknown: "us", // fallback
 };
 
-// ? Mock data
-const mockGAData = [
-  { country: "United States", activeUsers: "120" },
-  { country: "India", activeUsers: "95" },
-  { country: "Germany", activeUsers: "80" },
-  { country: "United Kingdom", activeUsers: "60" },
-  { country: "France", activeUsers: "45" },
-  { country: "Japan", activeUsers: "35" },
-  { country: "Canada", activeUsers: "25" },
-];
-
-const VisitorsByCountryForm = ({ gaData = mockGAData }) => {
+const VisitorsByCountryForm = () => {
+  const { countries: gaData, loading, error } = useVisitorsByCountry();
   const [countries, setCountries] = useState([]);
 
   useEffect(() => {
@@ -72,46 +61,49 @@ const VisitorsByCountryForm = ({ gaData = mockGAData }) => {
             <p className="text-lg font-bold">{allVisitors.toLocaleString()}</p>
             <p className="text-[11px]">Visual representation of visitor origins</p>
           </div>
+          {/* You can update growth % or remove if not required */}
           <div className="flex bg-[#F2FCF4] px-2 py-1 text-[#059669] items-center rounded-sm">
-            <p className="text-sm mr-2">4.3%</p>
-            <div className="w-4 h-4">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">
-                <path d="M10.3117 4.125L15.977 4.12539..." fill="#059669" />
-              </svg>
-            </div>
+            <p className="text-sm mr-2">+0%</p>
           </div>
         </div>
-        <div className="space-y-4">
-          {countries.map((country, i) => (
-            <motion.div
-              key={`${country.code}-${i}`}
-              initial={{ opacity: 0, x: 30 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: i * 0.1 }}
-              className="flex items-center gap-3"
-            >
-              <img
-                src={getFlagUrl(country.code)}
-                alt={`Flag of ${country.name}`}
-                className="w-8 h-6 rounded-sm border-2 border-blue-200"
-              />
-              <div className="flex-1">
-                <div className="flex items-center justify-between">
-                  <span className="text-xs text-gray-500 font-bold">{country.name}</span>
-                  <span className="text-xs font-bold text-gray-800">
-                    {((country.visitors / allVisitors) * 100).toFixed(0)}%
-                  </span>
+
+        {loading ? (
+          <p className="text-sm text-gray-500">Loading visitor data...</p>
+        ) : error ? (
+          <p className="text-sm text-red-500">Failed to load visitor data.</p>
+        ) : (
+          <div className="space-y-4">
+            {countries.map((country, i) => (
+              <motion.div
+                key={`${country.code}-${i}`}
+                initial={{ opacity: 0, x: 30 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: i * 0.1 }}
+                className="flex items-center gap-3"
+              >
+                <img
+                  src={getFlagUrl(country.code)}
+                  alt={`Flag of ${country.name}`}
+                  className="w-8 h-6 rounded-sm border-2 border-blue-200"
+                />
+                <div className="flex-1">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-gray-500 font-bold">{country.name}</span>
+                    <span className="text-xs font-bold text-gray-800">
+                      {((country.visitors / allVisitors) * 100).toFixed(0)}%
+                    </span>
+                  </div>
+                  <div className="w-[86%] bg-blue-200 h-1">
+                    <div
+                      className="bg-blue-800 h-1"
+                      style={{ width: `${(country.visitors / allVisitors) * 100}%` }}
+                    />
+                  </div>
                 </div>
-                <div className="w-[86%] bg-blue-200 h-1">
-                  <div
-                    className="bg-blue-800 h-1"
-                    style={{ width: `${(country.visitors / allVisitors) * 100}%` }}
-                  />
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
+              </motion.div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

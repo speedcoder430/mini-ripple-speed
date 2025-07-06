@@ -1,0 +1,22 @@
+# List of social media domains (one per line)
+facebook.com
+twitter.com
+instagram.com
+linkedin.com
+t.co
+fb.com
+pinterest.com
+reddit.com
+youtube.com
+whatsapp.com
+tiktok.com
+snapchat.com
+vk.com
+discord.com
+telegram.org
+wechat.com
+line.me
+viber.com
+mix.com
+quora.com
+medium.com

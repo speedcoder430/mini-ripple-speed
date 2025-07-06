@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import Topnav from "@/components/navbar/Topnav";
 import Sidebar from "@/components/sidebar/Sidebar";
-import VisitorIpManagementForm from "@/components/user/visitorIpManagement/visitorIpManagementForm";
+import VisitorIpManagementForm from "../../components/user/visitorIpManagement/visitorIpManagementForm";
 
 function VisitorIPManagement() {
     const [sidebarOpen, setSidebarOpen] = useState(false);

@@ -1,81 +1,58 @@
 import React, { useEffect, useState } from 'react';
 import ReactApexChart from 'react-apexcharts';
-import { parse, getDay, getHours } from 'date-fns';
+import axios from 'axios';
 
-const mockGaData = [
-    { dateHour: '2025042810', sessions: '5' },  // Monday, 10am
-    { dateHour: '2025042812', sessions: '8' },  // Monday, 12pm
-    { dateHour: '2025042914', sessions: '12' }, // Tuesday, 2pm
-    { dateHour: '2025043018', sessions: '20' }, // Wednesday, 6pm
-    { dateHour: '2025050116', sessions: '25' }, // Thursday, 4pm
-    { dateHour: '2025050210', sessions: '15' }, // Friday, 10am
-    { dateHour: '2025050302', sessions: '3' },  // Saturday, 2am
-    { dateHour: '2025050410', sessions: '7' },  // Sunday, 10am
-    { dateHour: '2025050416', sessions: '10' }, // Sunday, 4pm
-];
-
-const TrafficByTimeOfDayChart = ({ gaData = mockGaData }) => {
+const TrafficByTimeOfDayChart = () => {
     const [seriesData, setSeriesData] = useState([]);
 
     const hours = [
-        '12am', '2am', '4am', '6am', '8am', '10am', '12pm',
-        '2pm', '4pm', '6pm', '8pm', '10pm'
+        '12AM', '2AM', '4AM', '6AM', '8AM', '10AM', '12PM',
+        '2PM', '4PM', '6PM', '8PM', '10PM'
     ];
 
-    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-
-    const getHourSlot = (hour) => {
-        if (hour < 1) return '12am';
-        if (hour < 3) return '2am';
-        if (hour < 5) return '4am';
-        if (hour < 7) return '6am';
-        if (hour < 9) return '8am';
-        if (hour < 11) return '10am';
-        if (hour < 13) return '12pm';
-        if (hour < 15) return '2pm';
-        if (hour < 17) return '4pm';
-        if (hour < 19) return '6pm';
-        if (hour < 21) return '8pm';
-        return '10pm';
-    };
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
     useEffect(() => {
-        if (!Array.isArray(gaData)) return;
+        const fetchData = async () => {
+            try {
+                const res = await axios.get('/api/v2/dashboard/traffic/day-by-time');
+                const data = res.data?.data || [];
+                const heatMap = {};
+                for (const day of days) {
+                    heatMap[day] = {};
+                    for (const hour of hours) {
+                        heatMap[day][hour] = 0;
+                    }
+                }
+                data.forEach(dayEntry => {
+                    const { day, hours: hourEntries } = dayEntry;
+                    if (!day || !Array.isArray(hourEntries)) return;
 
-        const heatMap = {};
-        for (const day of days) {
-            heatMap[day] = {};
-            for (const hour of hours) {
-                heatMap[day][hour] = 0;
+                    hourEntries.forEach(({ hour, count }) => {
+                        if (hours.includes(hour)) {
+                            heatMap[day][hour] = count;
+                        }
+                    });
+                });
+                const transformed = days
+                    .slice()
+                    .reverse()
+                    .map((day) => ({
+                        name: day.slice(0, 3), // e.g. "Sun"
+                        data: hours.map((hour) => ({
+                            x: hour,
+                            y: heatMap[day][hour],
+                        })),
+                    }));
+
+                setSeriesData(transformed);
+            } catch (err) {
+                console.error('Failed to fetch heatmap data:', err);
             }
-        }
+        };
 
-        for (const row of gaData) {
-            if (!row.dateHour || !row.sessions) continue;
-
-            const dateTime = parse(row.dateHour, 'yyyyMMddHH', new Date());
-            if (isNaN(dateTime)) continue;
-
-            const sessions = parseInt(row.sessions) || 0;
-            const dayLabel = days[getDay(dateTime)];
-            const hourSlot = getHourSlot(getHours(dateTime));
-
-            heatMap[dayLabel][hourSlot] += sessions;
-        }
-
-        const transformed = days
-            .slice()
-            .reverse()
-            .map((day) => ({
-                name: day,
-                data: hours.map((hour) => ({
-                    x: hour,
-                    y: heatMap[day][hour],
-                })),
-            }));
-
-        setSeriesData(transformed);
-    }, [gaData]);
+        fetchData();
+    }, []);
 
     const chartData = {
         series: seriesData,

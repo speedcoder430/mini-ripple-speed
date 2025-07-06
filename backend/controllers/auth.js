@@ -192,6 +192,70 @@ exports.verifyEmail = async (req, res) => {
   }
 };
 
+
+
+//#region Firebase TOekn verify
+
+const handleFirebaseUser = async (idToken, provider = "firebase") => {
+  const decodedToken = await admin.auth().verifyIdToken(idToken);
+
+  const { uid, email, email_verified} = decodedToken;
+
+  const firebaseUser = await  admin.auth().getUser(uid); 
+  const name = firebaseUser.displayName || "No Name";
+  const picture = firebaseUser.photoURL || "";
+  if (!email) throw new Error("Email not found in token");
+
+  let user = await UserModel.findOne({ email });
+
+  if (!user) {
+    user = new UserModel({
+      firebaseUID: uid,
+      email,
+      name,
+      picture,
+      provider,
+    });
+    await user.save();
+  }
+
+  return {
+    user,
+    email_verified,
+    decodedToken,
+  };
+};
+
+
+
+exports.verifyFirebaseToken = async (req, res) => {
+  try {
+    const { idToken } = req.body;
+
+    if (!idToken) return res.status(400).json({ error: "ID token required" });
+
+    const { user, email_verified } = await handleFirebaseUser(idToken);
+
+    return res.status(200).json({
+      message: "User authenticated",
+      user: {
+        id: user._id,
+        email: user.email,
+        name: user.name,
+        photo: user.picture,
+        isEmailVerified: email_verified,
+      },
+    });
+
+  } catch (error) {
+    console.error("Firebase token verification error:", error);
+    return res.status(401).json({ error: "Invalid Firebase token" });
+  }
+};
+
+
+//#endregion
+
 // Google authentication
 exports.googleAuth = async (req, res) => {
   try {
@@ -306,3 +370,96 @@ exports.getUserData = async (req, res) => {
       .json({ message: "Internal server error while fetching user data." });
   }
 };
+
+
+
+//#region Facebook authentucation
+exports.facebookAuth = async (req, res) => {
+  try {
+    const { idToken } = req.body;
+
+    if (!idToken) {
+      return res.status(400).json({ message: "Missing ID token" });
+    }
+
+    // Verify Firebase ID token
+    const decodedToken = await admin.auth().verifyIdToken(idToken);
+    const { email, name, picture } = decodedToken;
+
+    // Find or create user
+    let user = await UserModel.findOne({ email });
+
+    if (!user) {
+      user = new UserModel({
+        email,
+        name,
+        picture,
+        provider: "facebook",
+      });
+      await user.save();
+    }
+
+    // Generate JWT
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "24h",
+    });
+
+    return res.status(200).json({
+      token, // Our backend JWT token
+      user: {
+        id: user._id,
+        email: user.email,
+        name: user.name,
+        picture: user.picture,
+      },
+    });
+
+  } catch (error) {
+    console.error("Facebook auth error:", error);
+    return res.status(500).json({ error: "Authentication failed" });
+  }
+};
+//#endregion
+
+
+//#region Email/Password Authentication
+// exports.firebaseAuth = async (req, res) => {
+//   try {
+//     const { idToken } = req.body;
+
+//     // Verify token
+//     const decodedToken = await admin.auth().verifyIdToken(idToken);
+//     const { uid, email, name, picture } = decodedToken;
+
+//     // Check if user exists
+//     let user = await UserModel.findOne({ email });
+
+//     if (!user) {
+//       // Create new user
+//       user = await UserModel.create({
+//         firebaseUID: uid,
+//         email,
+//         name: name || "No Name",
+//         photo: picture || "",
+//       });
+//     }
+
+//     return res.status(200).json({
+//       message: "Authenticated successfully",
+//       user: {
+//         id: user._id,
+//         email: user.email,
+//         name: user.name,
+//         isEmailVerified: decodedToken.email_verified,
+//         photo: user.photo,
+//       },
+//     });
+//   } catch (error) {
+//     console.error("Firebase Auth Error:", error);
+//     return res.status(401).json({ error: "Invalid Firebase token" });
+//   }
+// };
+
+
+
+//#endregion

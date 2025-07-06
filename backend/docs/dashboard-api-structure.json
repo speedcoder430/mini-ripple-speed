@@ -1,0 +1,219 @@
+{
+  "dashboardApiStructure": {
+    "version": "1.0.0",
+    "description": "JSON structure for Mini-Ripple dashboard API integration",
+    "endpoints": {
+      "summary": {
+        "path": "/api/v1/dashboard/summary",
+        "method": "GET",
+        "description": "Returns all dashboard data in a single request",
+        "requiresAuth": true
+      },
+      "domain": {
+        "path": "/api/v1/dashboard/domain",
+        "method": "GET",
+        "description": "Returns domain information",
+        "requiresAuth": true
+      },
+      "metrics": {
+        "path": "/api/v1/dashboard/metrics",
+        "method": "GET",
+        "description": "Returns metrics card data",
+        "requiresAuth": true
+      },
+      "trafficTrends": {
+        "path": "/api/v1/dashboard/traffic/trends",
+        "method": "GET",
+        "description": "Returns traffic trends data",
+        "requiresAuth": true,
+        "queryParams": {
+          "timeframe": {
+            "type": "string",
+            "enum": ["day", "week", "month"],
+            "default": "month"
+          }
+        }
+      },
+      "referralTraffic": {
+        "path": "/api/v1/dashboard/traffic/referrals",
+        "method": "GET",
+        "description": "Returns referral traffic data",
+        "requiresAuth": true
+      },
+      "visitorsByCountry": {
+        "path": "/api/v1/dashboard/visitors/countries",
+        "method": "GET",
+        "description": "Returns visitors by country data",
+        "requiresAuth": true
+      },
+      "mostVisitedPages": {
+        "path": "/api/v1/dashboard/pages/most-visited",
+        "method": "GET",
+        "description": "Returns most visited pages data",
+        "requiresAuth": true
+      },
+      "suspiciousActivities": {
+        "path": "/api/v1/dashboard/security/suspicious-activities",
+        "method": "GET",
+        "description": "Returns suspicious activity alerts",
+        "requiresAuth": true
+      }
+    },
+    "responseStructures": {
+      "domain": {
+        "name": "domainname.com",
+        "status": "active"
+      },
+      "metrics": {
+        "activeUsers": {
+          "value": 3500
+        },
+        "vpnUsers": {
+          "value": 234
+        },
+        "repeatedVisitors": {
+          "value": 285
+        },
+        "botsDetected": {
+          "value": 674
+        },
+        "mostUsedBrowser": {
+          "value": "Chrome",
+          "count": 8
+        }
+      },
+      "trafficTrends": {
+        "timeframe": "month",
+        "data": [
+          { "dateHour": "2025042301", "lastOneDay": 34, "lastSevenDays": 56 },
+          { "dateHour": "2025042302", "lastOneDay": 45, "lastSevenDays": 65 },
+          { "dateHour": "2025042401", "lastOneDay": 25, "lastSevenDays": 43 },
+          { "dateHour": "2025042402", "lastOneDay": 60, "lastSevenDays": 88 },
+          { "dateHour": "2025042501", "lastOneDay": 32, "lastSevenDays": 59 },
+          { "dateHour": "2025042502", "lastOneDay": 28, "lastSevenDays": 51 }
+        ]
+      },
+      "referralTraffic": {
+        "sources": [
+          { "sessionSource": "google", "sessions": 100 },
+          { "sessionSource": "facebook", "sessions": 50 },
+          { "sessionSource": "(direct)", "sessions": 150 },
+          { "sessionSource": "twitter", "sessions": 30 },
+          { "sessionSource": "bing", "sessions": 40 }
+        ],
+        "summary": {
+          "direct": 150,
+          "organic": 140,
+          "social": 80
+        }
+      },
+      "visitorsByCountry": {
+        "total": 460,
+        "countries": [
+          { "country": "United States", "activeUsers": 120, "code": "us" },
+          { "country": "India", "activeUsers": 95, "code": "in" },
+          { "country": "Germany", "activeUsers": 80, "code": "de" },
+          { "country": "United Kingdom", "activeUsers": 60, "code": "gb" },
+          { "country": "France", "activeUsers": 45, "code": "fr" }
+        ]
+      },
+      "mostVisitedPages": {
+        "pages": [
+          { "pagePath": "/", "screenPageViews": 120, "pageName": "Home" },
+          { "pagePath": "/dashboard", "screenPageViews": 95, "pageName": "Dashboard" },
+          { "pagePath": "/contact-us", "screenPageViews": 75, "pageName": "Contact Us" },
+          { "pagePath": "/about", "screenPageViews": 55, "pageName": "About" },
+          { "pagePath": "/services", "screenPageViews": 45, "pageName": "Services" }
+        ]
+      },
+      "suspiciousActivities": {
+        "alerts": [
+          {
+            "ip": "192.168.1.10",
+            "type": "VPN",
+            "date": "2025-05-01",
+            "status": "Flagged"
+          },
+          {
+            "ip": "203.45.67.89",
+            "type": "Bot",
+            "date": "2025-05-02",
+            "status": "Blocked"
+          },
+          {
+            "ip": "178.22.33.44",
+            "type": "Suspicious IP",
+            "date": "2025-05-03",
+            "status": "Flagged"
+          }
+        ]
+      },
+      "dashboardSummary": {
+        "domain": {
+          "name": "domainname.com",
+          "status": "active"
+        },
+        "metrics": {
+          "activeUsers": {
+            "value": 3500
+          },
+          "vpnUsers": {
+            "value": 234
+          },
+          "repeatedVisitors": {
+            "value": 285
+          },
+          "botsDetected": {
+            "value": 674
+          },
+          "mostUsedBrowser": {
+            "value": "Chrome",
+            "count": 8
+          }
+        },
+        "trafficTrends": {
+          "timeframe": "month",
+          "data": [
+            { "dateHour": "2025042301", "lastOneDay": 34, "lastSevenDays": 56 },
+            { "dateHour": "2025042302", "lastOneDay": 45, "lastSevenDays": 65 }
+          ]
+        },
+        "referralTraffic": {
+          "sources": [
+            { "sessionSource": "google", "sessions": 100 },
+            { "sessionSource": "facebook", "sessions": 50 },
+            { "sessionSource": "(direct)", "sessions": 150 }
+          ],
+          "summary": {
+            "direct": 150,
+            "organic": 140,
+            "social": 80
+          }
+        },
+        "visitorsByCountry": {
+          "total": 460,
+          "countries": [
+            { "country": "United States", "activeUsers": 120, "code": "us" },
+            { "country": "India", "activeUsers": 95, "code": "in" }
+          ]
+        },
+        "mostVisitedPages": {
+          "pages": [
+            { "pagePath": "/", "screenPageViews": 120, "pageName": "Home" },
+            { "pagePath": "/dashboard", "screenPageViews": 95, "pageName": "Dashboard" }
+          ]
+        },
+        "suspiciousActivities": {
+          "alerts": [
+            {
+              "ip": "192.168.1.10",
+              "type": "VPN",
+              "date": "2025-05-01",
+              "status": "Flagged"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

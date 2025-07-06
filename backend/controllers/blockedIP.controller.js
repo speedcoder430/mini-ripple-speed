@@ -1,21 +1,25 @@
-const BlockedIP = require("../models/BlockedIP");
+const BlockedIP = require("../models/blockedIP.model");
 const Property = require("../models/property.model");
+const DeviceBlocked = require("../models/blockedDevice.model");
 const geoip = require("geoip-lite");
-/**
- * Block an IP for a specific property
- */
+const UAParser = require("ua-parser-js");
+
 exports.blockIP = async (req, res) => {
   try {
-    const { ip, reason, propertyId, expiresAt } = req.body;
-    const blockedBy = req.body.blockedBy || null; // or fallback user ID
+    const userId = req.user._id; // Get user ID from auth middleware
 
-    if (!ip || !reason || !propertyId || !blockedBy) {
+    const property = await Property.findOne({ user: userId });
+    const propertyId = property.propertyId;
+
+    const { ip, reason, expiresAt } = req.body;
+    const blockedBy = userId;
+
+    if (!ip || !reason) {
       return res
         .status(400)
         .json({ success: false, error: "Missing required fields." });
     }
 
-    const property = await Property.findOne({ propertyId });
     if (!property) {
       return res
         .status(404)
@@ -46,10 +50,19 @@ exports.blockIP = async (req, res) => {
       { upsert: true, new: true }
     );
 
+    const simplifiedBlock = {
+      ip: block.ip,
+      reason: block.reason,
+      isActive: block.isActive,
+      blockedAt: block.updatedAt,
+      blockType: block.blockType,
+      expiresAt: block.expiresAt,
+    };
+    
     res.status(201).json({
       success: true,
       message: "IP blocked successfully",
-      block,
+      data: simplifiedBlock,
     });
   } catch (err) {
     console.error("Error blocking IP:", err);
@@ -62,12 +75,17 @@ exports.blockIP = async (req, res) => {
  */
 exports.unblockIP = async (req, res) => {
   try {
-    const { ip, propertyId } = req.body;
+    const userId = req.user._id; // Get user ID from auth middleware
 
-    if (!ip || !propertyId) {
+    const property = await Property.findOne({ user: userId });
+    const propertyId = property.propertyId;
+
+    const { ip } = req.body;
+
+    if (!ip) {
       return res
         .status(400)
-        .json({ success: false, error: "IP and propertyId are required." });
+        .json({ success: false, error: "IP is required." });
     }
 
     const existing = await BlockedIP.findOne({ ip, propertyId });
@@ -81,9 +99,18 @@ exports.unblockIP = async (req, res) => {
     existing.isActive = false;
     await existing.save();
 
+    const simplifiedBlock = {
+      ip: existing.ip,
+      reason: existing.reason,
+      isActive: existing.isActive,
+      blockedAt: existing.updatedAt,
+      blockType: existing.blockType,
+      expiresAt: existing.expiresAt,
+    };
+    
     res
       .status(200)
-      .json({ success: true, message: "IP unblocked successfully" });
+      .json({ success: true, message: "IP unblocked successfully", data: simplifiedBlock });
   } catch (err) {
     console.error("Error unblocking IP:", err);
     res.status(500).json({ success: false, error: "Internal server error" });
@@ -95,7 +122,11 @@ exports.unblockIP = async (req, res) => {
  */
 exports.checkIPStatus = async (req, res) => {
   try {
-    const { propertyId } = req.body;
+    const { propertyId, userAgent } = req.body;
+    const parser = new UAParser(userAgent);
+    const deviceInfo = parser.getResult();
+    const deviceType = deviceInfo.device?.type
+ 
 
     if (!propertyId) {
       return res.status(400).json({ error: "PropertyID is required." });
@@ -119,12 +150,32 @@ exports.checkIPStatus = async (req, res) => {
       isActive: true,
     });
 
-    if (ipBlocked || countryBlocked) {
+    const deviceBlocked = await DeviceBlocked.findOne({
+      deviceType,
+      isBlocked: true,
+    });
+
+    if (ipBlocked) {
       return res.status(200).json({
         blocked: true,
-        reason: blocked.reason,
-        expiresAt: blocked.expiresAt,
+        reason: ipBlocked.reason,
+        expiresAt: ipBlocked.expiresAt,
         redirectUrl: "https://test-miniripple.onrender.com/blocked.html",
+      });
+    }
+
+    if (countryBlocked) {
+      return res.status(200).json({
+        blocked: true,
+        reason: "You are not allowed to access the site from this country",
+        redirectUrl: "https://test-miniripple.onrender.com/blocked.html"
+      });
+    }
+    if (deviceBlocked) {
+      return res.status(200).json({
+        blocked: true,
+        reason: "Device blocked",
+        redirectUrl: "https://test-miniripple.onrender.com/blocked.html"
       });
     }
 
@@ -140,26 +191,32 @@ exports.checkIPStatus = async (req, res) => {
  */
 exports.listBlockedIPs = async (req, res) => {
   try {
-    const { propertyId } = req.params;
 
-    if (!propertyId) {
-      return res.status(400).json({ error: "propertyId is required." });
-    }
-    const property = await Property.findOne({ propertyId });
+    const userId = req.user._id; // Get user ID from auth middleware
+    const property = await Property.findOne({ user: userId });
+    const propertyId = property.propertyId;
+
     if (!property) {
-      return res.status(404).json({ error: "Property not found" });
+      return res.status(404).json({ success: false, error: "Property not found" });
     }
 
     const blockedIPs = await BlockedIP.find({
       propertyId,
       isActive: true,
     });
-    console.log("pid", property._id);
-    console.log("blockedIPs", blockedIPs);
-
-    res.status(200).json({ success: true, blockedIPs });
+    
+    const simplifiedBlockedIPs = blockedIPs.map(block => ({
+      ip: block.ip,
+      reason: block.reason,
+      isActive: block.isActive,
+      blockedAt: block.updatedAt,
+      blockType: block.blockType,
+      expiresAt: block.expiresAt,
+    }));
+    
+    res.status(200).json({ success: true, data: simplifiedBlockedIPs });
   } catch (err) {
     console.error("Error fetching blocked IPs:", err);
-    res.status(500).json({ error: "Internal server error" });
+    res.status(500).json({ success: false, error: "Internal server error" });
   }
 };

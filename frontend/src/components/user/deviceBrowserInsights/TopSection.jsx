@@ -1,102 +1,135 @@
 import React, { useState } from "react";
-import "react-datepicker/dist/react-datepicker.css";
+import { useDeviceFilter } from "./DeviceFilterProvider";
 
-const devices = ["No Device", "Mobile", "Tablet", "Desktop"];
-const browsers = ["No Browser", "Chrome", "Firefox", "Edge", "Opera", "Safari"];
+const devices = ["Mobile", "Tablet", "Desktop", "Other"];
+const browsers = ["Chrome", "Firefox", "Edge", "Opera", "Safari", "Other"];
 
 const TopSection = () => {
-    const [selectedDevice, setSelectedDevice] = useState("No Device");
-    const [selectedBrowser, setSelectedBrowser] = useState("No Browser");
-    const [openDropdown, setOpenDropdown] = useState(null); // 'device' or 'browser'
+    const {
+        blockedDevices,
+        blockedBrowsers,
+        addDevice,
+        removeDevice,
+        addBrowser,
+        removeBrowser,
+    } = useDeviceFilter();
 
-    const toggleDropdown = (type) => {
-        setOpenDropdown(prev => (prev === type ? null : type));
-    };
-
-    const handleDeviceSelect = (device) => {
-        setSelectedDevice(device);
-        setOpenDropdown(null);
-    };
-
-    const handleBrowserSelect = (browser) => {
-        setSelectedBrowser(browser);
-        setOpenDropdown(null);
-    };
+    const [deviceSearch, setDeviceSearch] = useState("");
+    const [browserSearch, setBrowserSearch] = useState("");
+    const [deviceDropdownOpen, setDeviceDropdownOpen] = useState(false);
+    const [browserDropdownOpen, setBrowserDropdownOpen] = useState(false);
 
     return (
-        <div className="flex flex-wrap gap-5 justify-between pr-6 mt-6 w-full max-md:mr-2.5 max-md:max-w-full">
-            <div className="flex flex-wrap gap-3 px-6 bg-gradient-to-r from-blue-start to-blue-end font-['Jost'] w-50% max-md:max-w-full">
-                {/* Device Dropdown */}
-                <div className="relative flex gap-1.5 items-center">
-                    <p className="text-base text-slate-900">Blocked</p>
-                    <div className="relative">
-                        <div
-                            className="flex gap-2 items-center px-5 rounded cursor-pointer min-h-[46px]"
-                            onClick={() => toggleDropdown("device")}
-                        >
-                            <p className="text-base font-semibold leading-none text-slate-900 w-[100px]">
-                                {selectedDevice}
-                            </p>
-                            <img
-                                src="/page/visitorIpManagement/main-form-12.svg"
-                                className={`w-2.5 transition-transform ${openDropdown === "device" ? "rotate-180" : ""}`}
-                                alt="Dropdown arrow"
-                            />
-                        </div>
-
-                        {openDropdown === "device" && (
-                            <div className="absolute z-10 mt-3 bg-white shadow-md rounded w-full max-h-60 overflow-y-auto">
-                                {devices.map((device) => (
+        <div className="flex flex-wrap gap-3 px-6 bg-gradient-to-r from-blue-start to-blue-end py-3 my-3">
+            {/* Devices */}
+            <div className="relative flex flex-col gap-1.5 min-w-[240px]">
+                <p className="text-base text-slate-900">Blocked Devices</p>
+                <div className="relative">
+                    <input
+                        type="text"
+                        className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none"
+                        placeholder="Select device types..."
+                        value={deviceSearch}
+                        onChange={(e) => setDeviceSearch(e.target.value)}
+                        onFocus={() => setDeviceDropdownOpen(true)}
+                    />
+                    {deviceDropdownOpen && (
+                        <div className="absolute z-10 mt-1 w-full bg-white border shadow-md rounded max-h-60 overflow-y-auto">
+                            {devices
+                                .filter((d) => d.toLowerCase().includes(deviceSearch.toLowerCase()))
+                                .map((device) => (
                                     <div
                                         key={device}
-                                        className="px-4 py-2 hover:bg-blue-100 cursor-pointer text-slate-900 text-sm"
-                                        onClick={() => handleDeviceSelect(device)}
+                                        className="px-4 py-2 text-sm text-slate-900 hover:bg-blue-100 cursor-pointer"
+                                        onMouseDown={() => {
+                                            addDevice(device);
+                                            setDeviceSearch("");
+                                            setDeviceDropdownOpen(false);
+                                        }}
                                     >
                                         {device}
                                     </div>
                                 ))}
-                            </div>
-                        )}
-                    </div>
+                        </div>
+                    )}
                 </div>
 
-                <div className="w-[2px] max-h-9/12 bg-gray-300 my-2 mr-4"></div>
+                {/* Selected Devices Tags */}
+                {blockedDevices.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-2">
+                        {blockedDevices.map((device) => (
+                            <div
+                                key={device}
+                                className="flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 text-sm text-blue-800"
+                            >
+                                {device}
+                                <button
+                                    onClick={() => removeDevice(device)}
+                                    className="text-blue-800 hover:text-red-500"
+                                >
+                                    ×
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
 
-                {/* Browser Dropdown */}
-                <div className="relative flex gap-1.5 items-center">
-                    <p className="text-base text-slate-900">Blocked</p>
-                    <div className="relative">
-                        <div
-                            className="flex gap-2 items-center px-5 rounded cursor-pointer min-h-[46px]"
-                            onClick={() => toggleDropdown("browser")}
-                        >
-                            <p className="text-base font-semibold leading-none text-slate-900 w-[100px]">
-                                {selectedBrowser}
-                            </p>
-                            <img
-                                src="/page/visitorIpManagement/main-form-12.svg"
-                                className={`w-2.5 transition-transform ${openDropdown === "browser" ? "rotate-180" : ""}`}
-                                alt="Dropdown arrow"
-                            />
-                        </div>
-
-                        {openDropdown === "browser" && (
-                            <div className="absolute z-10 mt-3 bg-white shadow-md rounded w-full max-h-60 overflow-y-auto">
-                                {browsers.map((browser) => (
+            {/* Browsers */}
+            <div className="relative flex flex-col gap-1.5 min-w-[240px]">
+                <p className="text-base text-slate-900">Blocked Browsers</p>
+                <div className="relative">
+                    <input
+                        type="text"
+                        className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none"
+                        placeholder="Select browsers..."
+                        value={browserSearch}
+                        onChange={(e) => setBrowserSearch(e.target.value)}
+                        onFocus={() => setBrowserDropdownOpen(true)}
+                    />
+                    {browserDropdownOpen && (
+                        <div className="absolute z-10 mt-1 w-full bg-white border shadow-md rounded max-h-60 overflow-y-auto">
+                            {browsers
+                                .filter((b) => b.toLowerCase().includes(browserSearch.toLowerCase()))
+                                .map((browser) => (
                                     <div
                                         key={browser}
-                                        className="px-4 py-2 hover:bg-blue-100 cursor-pointer text-slate-900 text-sm"
-                                        onClick={() => handleBrowserSelect(browser)}
+                                        className="px-4 py-2 text-sm text-slate-900 hover:bg-blue-100 cursor-pointer"
+                                        onMouseDown={() => {
+                                            addBrowser(browser);
+                                            setBrowserSearch("");
+                                            setBrowserDropdownOpen(false);
+                                        }}
                                     >
                                         {browser}
                                     </div>
                                 ))}
-                            </div>
-                        )}
-                    </div>
+                        </div>
+                    )}
                 </div>
+
+                {/* Selected Browsers Tags */}
+                {blockedBrowsers.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-2">
+                        {blockedBrowsers.map((browser) => (
+                            <div
+                                key={browser}
+                                className="flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 text-sm text-blue-800"
+                            >
+                                {browser}
+                                <button
+                                    onClick={() => removeBrowser(browser)}
+                                    className="text-blue-800 hover:text-red-500"
+                                >
+                                    ×
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
         </div>
+
     );
 };
 

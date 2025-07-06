@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../middlewares/authContext";
 
 const SidebarNavItem = ({
     icon,
@@ -7,26 +8,34 @@ const SidebarNavItem = ({
     isActive = false,
     isCollapsed = false,
     path = "#",
+    disabled = true,
 }) => {
     const navigate = useNavigate();
-
-    const handleClick = () => {
+    // const logout = useAuth().logout();
+    const { logout } = useAuth();
+    const handleClick = async () => {
         if (path === "/login") {
-            localStorage.removeItem("user");
-            localStorage.removeItem("token");
+            await logout();
             navigate("/login");
             return;
         }
+
+        if (disabled) return; // Prevent other navigation if disabled
 
         if (path && path !== "#") {
             navigate(path);
         }
     };
 
+
     return (
         <nav
             onClick={handleClick}
-            className={`flex gap-2 items-center ${isCollapsed ? "justify-start" : "justify-start"} px-4 py-2.5 cursor-pointer mt-2 w-full text-sm tracking-tight leading-none border-l-4 font-['Amble']  ${isActive ? "border-[#245BD1] bg-[rgba(36,91,209,0.20)] font-semibold text-white" : "border-[#0000]"} text-neutral-300 ease-in-out hover:bg-gradient-to-r hover:from-[rgba(36,91,209,0.20)] hover:to-transparent hover:border-[#245BD1]`}
+            className={`flex gap-2 items-center ${isCollapsed ? "justify-start" : "justify-start"} 
+            px-4 py-2.5 cursor-pointer mt-2 w-full text-sm tracking-tight leading-none border-l-4 
+            font-['Amble'] transition-all duration-300 ease-in-out
+            ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}
+            ${isActive ? "border-[#245BD1] bg-[rgba(36,91,209,0.20)] font-semibold text-white" : "border-[#0000]"} text-neutral-300 ease-in-out hover:bg-gradient-to-r hover:from-[rgba(36,91,209,0.20)] hover:to-transparent hover:border-[#245BD1]`}
             title={isCollapsed ? text : ""}
         >
             <div

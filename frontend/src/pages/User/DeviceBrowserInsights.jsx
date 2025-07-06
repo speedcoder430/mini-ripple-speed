@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import Sidebar from "@/components/sidebar/Sidebar";
 import Topnav from "@/components/navbar/Topnav";
 import DeviceBrowserInsightsForm from "@/components/user/deviceBrowserInsights/DeviceBrowserInsightsForm";
-
+import { DeviceFilterProvider } from "@/components/user/deviceBrowserInsights/DeviceFilterProvider";
 function DeviceBrowserInsights() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const sidebarRef = useRef();
@@ -31,7 +31,10 @@ function DeviceBrowserInsights() {
                 <Sidebar ref={sidebarRef} isOpen={sidebarOpen} setIsOpen={setSidebarOpen} />
                 <div className="flex-1">
                     <Topnav ref={topnavRef} onMenuClick={() => setSidebarOpen(true)} />
-                    <DeviceBrowserInsightsForm />
+                    {/* <DeviceBrowserInsightsForm /> */}
+                    <DeviceFilterProvider>
+                        <DeviceBrowserInsightsForm />
+                    </DeviceFilterProvider>
                 </div>
             </div>
         </>

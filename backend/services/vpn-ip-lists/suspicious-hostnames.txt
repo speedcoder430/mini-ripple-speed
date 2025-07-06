@@ -1,0 +1,7 @@
+amazonaws.com
+googleusercontent.com
+digitalocean.com
+azure.com
+linode.com
+vultr.com
+ovh.net

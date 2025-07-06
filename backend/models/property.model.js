@@ -14,6 +14,10 @@ const propertySchema = new mongoose.Schema({
     unique: true,
     index: true,
   },
+  propertyName: {
+    type: String,
+    required: true,
+  },
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "user",
@@ -22,6 +26,11 @@ const propertySchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now,
+  },
+  status: {
+    type: String,
+    enum: ['active', 'inactive'],
+    default: 'active'
   },
 });
 

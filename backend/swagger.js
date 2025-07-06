@@ -1,6 +1,7 @@
 const swaggerJsdoc = require("swagger-jsdoc");
 
 const options = {
+
   definition: {
     openapi: "3.0.0",
     info: {
@@ -19,6 +20,13 @@ const options = {
       },
     ],
     components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT", // Firebase ID token is still a JWT
+        },
+      },
       schemas: {
         User: {
           type: "object",
@@ -198,8 +206,10 @@ const options = {
         },
       },
     },
+    security: [{ bearerAuth: [] }],
   },
   apis: ["./routes/*.js", "./controllers/*.js", "./docs/components/*.yaml"], // adjust if your route files are elsewhere
 };
+
 
 module.exports = swaggerJsdoc(options);

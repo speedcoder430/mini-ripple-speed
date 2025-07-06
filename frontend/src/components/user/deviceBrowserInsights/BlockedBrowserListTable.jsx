@@ -8,8 +8,8 @@ const mockGaData = [
     { pagePath: '/dashboard', bounceRate: '0.20', averageSessionDuration: '2000', browser: 'HeadlessChrome', date: '2025-05-05' },
 ];
 
-const BlockedBrowserListTable = ({ gaData = mockGaData }) => {
-    const [blockedBrowsers, setBlockedBrowsers] = useState([]);
+const BlockedBrowserListTable = ({ gaData = mockGaData, blockedBrowsers = [] }) => {
+    const [filteredData, setFilteredData] = useState([]);
 
     useEffect(() => {
         if (!Array.isArray(gaData)) return;
@@ -52,14 +52,19 @@ const BlockedBrowserListTable = ({ gaData = mockGaData }) => {
             }
         });
 
-        const result = Array.from(browserMap.values()).map((entry) => ({
+        let result = Array.from(browserMap.values()).map((entry) => ({
             browser: entry.browser,
             reasons: Array.from(entry.reasons).join(', '),
             count: entry.count,
         }));
 
-        setBlockedBrowsers(result);
-    }, [gaData]);
+        // ✅ Apply browser filter
+        result = blockedBrowsers.length > 0
+            ? result.filter((b) => blockedBrowsers.includes(b.browser))
+            : result;
+
+        setFilteredData(result);
+    }, [gaData, blockedBrowsers]);
 
     return (
         <div className="w-full relative">
@@ -72,8 +77,8 @@ const BlockedBrowserListTable = ({ gaData = mockGaData }) => {
                         </tr>
                     </thead>
                     <tbody>
-                        {blockedBrowsers.length > 0 ? (
-                            blockedBrowsers.map((item, idx) => (
+                        {filteredData.length > 0 ? (
+                            filteredData.map((item, idx) => (
                                 <tr key={idx} className="border-b hover:bg-gray-50 text-sm">
                                     <td className="p-3 px-6">{item.browser}</td>
                                     <td className="p-3">{item.reasons}</td>

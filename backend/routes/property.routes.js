@@ -3,7 +3,7 @@ const router = express.Router();
 const propertyController = require("../controllers/property.controller");
 
 // Create a new property
-router.post("/", propertyController.createProperty);
+router.post("/", propertyController.createOrUpdateProperty);
 
 // Get all properties
 router.get("/all/:userId", propertyController.getAllProperties);
@@ -13,6 +13,9 @@ router.get("/:propertyId", propertyController.getPropertyByPropertyId);
 
 // Update a property
 router.put("/:propertyId", propertyController.updateProperty);
+
+// Toggle property status (active/inactive)
+router.patch("/:propertyId/status", propertyController.togglePropertyStatus);
 
 // Delete a property
 router.delete("/:propertyId", propertyController.deleteProperty);

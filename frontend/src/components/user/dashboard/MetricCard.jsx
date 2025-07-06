@@ -1,15 +1,20 @@
 import React from "react";
 
+// Helper to get current month/year in "Month YYYY" format
+const getCurrentMonthYear = () => {
+    const date = new Date();
+    return date.toLocaleString("default", { month: "long", year: "numeric" });
+};
+
 function MetricCard({
-    title,
-    icon,
-    value,
-    change,
-    changeIcon,
-    changeType,
-    bgColor,
+    title = "Untitled Metric",
+    icon = "",
+    value = "—",
+    change = "—",
+    changeIcon = "",
+    changeType = "neutral",
+    bgColor = "bg-gray-100 border-gray-200 border-2",
 }) {
-    // Define color classes based on change type
     const getChangeClasses = () => {
         switch (changeType) {
             case "positive":
@@ -23,7 +28,7 @@ function MetricCard({
             case "purple":
                 return "text-violet-600 bg-violet-200";
             default:
-                return "text-emerald-600 bg-emerald-200";
+                return "text-slate-500 bg-slate-200";
         }
     };
 
@@ -32,30 +37,36 @@ function MetricCard({
             className={`flex flex-col flex-1 shrink self-stretch p-5 my-auto ${bgColor} rounded-lg shadow-sm basis-0 lg:min-w-[320px] xl:min-w-[320px] 2xl:min-w-[200px]`}
         >
             <div className="flex gap-2.5 items-center self-start text-base text-slate-900">
-                <img
-                    src={icon}
-                    alt={`${title} icon`}
-                    className="object-contain shrink-0 self-stretch my-auto w-5 aspect-square"
-                />
-                <span className="self-stretch my-auto font-['Jost']">{title}</span>
+                {icon && (
+                    <img
+                        src={icon}
+                        alt={`${title} icon`}
+                        className="w-5 aspect-square object-contain shrink-0"
+                    />
+                )}
+                <span className="font-semibold">{title}</span>
             </div>
+
             <div className="flex gap-6 items-center mt-5 w-full whitespace-nowrap">
-                <span className="flex-1 shrink self-stretch my-auto text-2xl font-semibold leading-none basis-3 text-slate-900 font-['Jost']">
+                <span className="flex-1 text-2xl font-semibold text-slate-900">
                     {value}
                 </span>
                 <div
-                    className={`flex gap-1 items-center self-stretch px-1.5 py-1 my-auto text-sm tracking-tight leading-none ${getChangeClasses()} rounded-sm`}
+                    className={`flex gap-1 items-center px-1.5 py-1 text-sm rounded-sm ${getChangeClasses()}`}
                 >
-                    <span className="self-stretch my-auto font-['Amble']">{change}</span>
-                    <img
-                        src={changeIcon}
-                        alt="Change indicator"
-                        className="object-contain shrink-0 self-stretch my-auto aspect-square w-[18px]"
-                    />
+                    <span>{change}</span>
+                    {changeIcon && (
+                        <img
+                            src={changeIcon}
+                            alt="Change indicator"
+                            className="w-[18px] aspect-square object-contain"
+                        />
+                    )}
                 </div>
             </div>
-            <p className="mt-5 text-sm tracking-tight leading-none text-slate-900 font-['Amble']">
-                This month March 2025
+
+            <p className="mt-5 text-sm text-slate-700">
+                This month {getCurrentMonthYear()}
             </p>
         </article>
     );

@@ -1,0 +1,21 @@
+# List of search engine domains (one per line)
+google.com
+yahoo.com
+bing.com
+yandex.com
+baidu.com
+duckduckgo.com
+aol.com
+ask.com
+naver.com
+seznam.cz
+sogou.com
+ecosia.org
+qwant.com
+startpage.com
+search.com
+lycos.com
+exalead.com
+hotbot.com
+webcrawler.com
+mamma.com

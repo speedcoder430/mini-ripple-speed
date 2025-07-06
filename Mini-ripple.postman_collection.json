@@ -1,0 +1,1326 @@
+{
+	"info": {
+		"_postman_id": "5e9f9c71-f88b-45a0-b51c-a9466da896d7",
+		"name": "Mini-ripple",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "45816461",
+		"_collection_link": "https://guoxianli-4486986.postman.co/workspace/Mini-ripple~4cb16dc1-c2ed-4a6f-8a2c-088f22a424c8/collection/44200008-5e9f9c71-f88b-45a0-b51c-a9466da896d7?action=share&source=collection_link&creator=45816461"
+	},
+	"item": [
+		{
+			"name": "Property",
+			"item": [
+				{
+					"name": "Create new property",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"domain\": \"fekede.com\",\n  \"propertyName\": \"Fekede Personal Portfolio\",\n  \"user\": \"665f8e1f7b9d5a7e3c4f5678\",\n  \"status\": \"active\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v2/property",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"property"
+							]
+						},
+						"description": "## Add Property\n\nThis endpoint allows users to add a new property to the system. It is designed to accept property details in a structured format, which will then be processed and stored in the database.\n\n### Request\n\n**Method:** POST  \n**Endpoint:** `{{host}}/api/v2/property`\n\n#### Request Body\n\nThe request body must be in JSON format and should include the following parameters:\n\n- **domain** (string): The domain associated with the property.\n    \n- **propertyName** (string): The name of the property being added.\n    \n- **user** (string): The unique identifier of the user adding the property.\n    \n- **status** (string): The current status of the property (e.g., \"active\").\n    \n\n**Example Request Body:**\n\n``` json\n{\n  \"domain\": \"example.com\",\n  \"propertyName\": \"Example Property\",\n  \"user\": \"user_id\",\n  \"status\": \"active\"\n}\n\n ```\n\n### Response\n\nUpon successfully adding the property, the server will respond with a confirmation message and the details of the added property. The structure of the response will typically include:\n\n- **success** (boolean): Indicates whether the property was added successfully.\n    \n- **message** (string): A message providing additional information about the operation.\n    \n- **data** (object): Contains the details of the added property, including the same parameters sent in the request.\n    \n\n**Example Response:**\n\n``` json\n{\n  \"success\": true,\n  \"message\": \"Property added successfully.\",\n  \"data\": {\n    \"domain\": \"example.com\",\n    \"propertyName\": \"Example Property\",\n    \"user\": \"user_id\",\n    \"status\": \"active\"\n  }\n}\n\n ```\n\nThis endpoint is essential for managing properties within the application, allowing users to maintain their listings effectively."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Property",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"domain\": \"https://buildright-dusky.vercel.app/\",\n  \"propertyName\": \"Build Right\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v2/property/{{propertyID}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"property",
+								"{{propertyID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Toggle Status",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"active\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v2/property/{{propertyID}}/status",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"property",
+								"{{propertyID}}",
+								"status"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Single Property",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v2/property/{{propertyID}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"property",
+								"{{propertyID}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get all properties by UserID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var template = `",
+									"<style type=\"text/css\">",
+									"    .tftable {font-size:14px;color:#333333;width:100%;border-width: 1px;border-color: #87ceeb;border-collapse: collapse;}",
+									"    .tftable th {font-size:18px;background-color:#87ceeb;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;text-align:left;}",
+									"    .tftable tr {background-color:#ffffff;}",
+									"    .tftable td {font-size:14px;border-width: 1px;padding: 8px;border-style: solid;border-color: #87ceeb;}",
+									"    .tftable tr:hover {background-color:#e0ffff;}",
+									"</style>",
+									"",
+									"<table class=\"tftable\" border=\"1\">",
+									"    <tr>",
+									"        <th>ID</th>",
+									"        <th>Property ID</th>",
+									"        <th>Domain</th>",
+									"        <th>User</th>",
+									"        <th>Created At</th>",
+									"        <th>__v</th>",
+									"    </tr>",
+									"    ",
+									"    {{#each response.properties}}",
+									"        <tr>",
+									"            <td>{{_id}}</td>",
+									"            <td>{{propertyId}}</td>",
+									"            <td>{{domain}}</td>",
+									"            <td>{{user}}</td>",
+									"            <td>{{createdAt}}</td>",
+									"            <td>{{__v}}</td>",
+									"        </tr>",
+									"    {{/each}}",
+									"</table>",
+									"`;",
+									"",
+									"function constructVisualizerPayload() {",
+									"    return { response: pm.response.json() }",
+									"}",
+									"",
+									"pm.visualizer.set(template, constructVisualizerPayload());"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v2/property/all/{{user}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"property",
+								"all",
+								"{{user}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Single Property",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v2/property/{{propertyID}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"property",
+								"{{propertyID}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "VisitorLog",
+			"item": [
+				{
+					"name": "Track Visitor",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"visitorId\": \"v-170d7a33a-9000-4ad4-9fab-50514948d5609\",\n  \"propertyId\": \"MR-e85e8683\",\n  \"userAgent\": \"Chrome/112.0.0.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36\",\n  \"screen\": \"1920x1080\",\n  \"language\": \"en-US\",\n  \"domain\": \"fekede.com\",\n  \"timezone\": \"Africa/Addis_Ababa\",\n  \"referrer\": \"https://google.com\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v2/visitor/track",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"visitor",
+								"track"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Single Visitor",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v2/visitor/6806a358583e7226f9aca363",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"visitor",
+								"6806a358583e7226f9aca363"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Visitors",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v2/visitor/all/{{propertyID}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"visitor",
+								"all",
+								"{{propertyID}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "BlockedIP",
+			"item": [
+				{
+					"name": "Block IP",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"ip\": \"196.189.113.136\",\n  \"reason\": \"Unusual activity detected\",\n  \"propertyId\": \"MR-adb6b226\",\n  \"blockedBy\": \"661f442ad77a3fae66c574a9\", \n  \"expiresAt\": \"2025-05-01T00:00:00.000Z\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v2/blocked-ip/block",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"blocked-ip",
+								"block"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Unblock IP",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n \"ip\": \"196.189.113.136\",\n \"propertyId\": \"MR-adb6b226\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v2/blocked-ip/unblock",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"blocked-ip",
+								"unblock"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Check IP Status",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n \"propertyId\": \"MR-abc123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v2/blocked-ip/check",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"blocked-ip",
+								"check"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Blocked IPs",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v2/blocked-ip/MR-abc123",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"blocked-ip",
+								"MR-abc123"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "BlockedCountry",
+			"item": [
+				{
+					"name": "Block Country",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"propertyId\": \"MR-f8d79013\",\n  \"countryCode\": \"CN\",\n  \"reason\": \"High spam activity from this region\",\n  \"blockedBy\": \"6601a9b2c9e77a1fc8df1234\"  // 👈 user._id (MongoDB ObjectId of the admin/user)\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v2/blocked-country/block",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"blocked-country",
+								"block"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Unblock Country",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"propertyId\": \"MR-f8d79013\",\n  \"countryCode\": \"CN\"\n  }",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v2/blocked-country/unblock",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"blocked-country",
+								"unblock"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Blocked Countries",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"ip\": \"196.189.113.136\",\n  \"reason\": \"Unusual activity detected\",\n  \"propertyId\": \"MR-adb6b226\",\n  \"blockedBy\": \"661f442ad77a3fae66c574a9\", \n  \"expiresAt\": \"2025-05-01T00:00:00.000Z\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v2/blocked-country/MR-f8d79013",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"blocked-country",
+								"MR-f8d79013"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "BlockedDevice",
+			"item": [
+				{
+					"name": "Unblock Device",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"propertyId\": \"MR-f8d79013\",\n  \"deviceType\": \"desktop\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v2/device-block/unblock",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"device-block",
+								"unblock"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Block Device",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"propertyId\": \"MR-f8d79013\",\n  \"deviceType\": \"mobile\",\n  \"reason\":\"new reason\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v2/device-block/block",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"device-block",
+								"block"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Blocked Devices",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v2/device-block/{{propertyID}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"device-block",
+								"{{propertyID}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "BlockedBrowser",
+			"item": [
+				{
+					"name": "Unblock Browser",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"propertyId\": \"MR-f8d79013\",\n  \"browserName\": \"chrome\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v2/browser-block/unblock",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"browser-block",
+								"unblock"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Block Browser",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"propertyId\": \"MR-f8d79013\",\n  \"browserName\": \"chrome\",\n  \"reason\": \"suspicious activity\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v2/browser-block/block",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"browser-block",
+								"block"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Blocked Browser",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v2/browser-block/{{propertyID}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"browser-block",
+								"{{propertyID}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Snippets",
+			"item": [
+				{
+					"name": "Track Visitor",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"visitorId\": \"visitor_12345\",\n  \"propertyId\": \"MR-f8d79013\",\n  \"domain\": \"buildright-dusky.vercel.app\",\n  \"userAgent\": \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.1 Safari/537.36\",\n  \"language\": \"en-US\",\n  \"timezone\": \"Europe/Istanbul\",\n  \"referrer\": \"https://buildright-dusky.vercel.app/\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v2/visitor/track",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"visitor",
+								"track"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create Session",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"visitorId\": \"visitor_12345\",\n  \"propertyId\": \"MR-f8d79013\",\n  \"sessionId\": \"session_abcde_001\",\n  \"referrer\": \"https://buildright-dusky.vercel.app/\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v2/visitor/session-start",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"visitor",
+								"session-start"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send Heartbeat",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v2/visitor/heartbeat",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"visitor",
+								"heartbeat"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send log",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"visitorId\": \"visitor_12345\",\n  \"sessionId\": \"session_abcde_001\",\n  \"propertyId\": \"MR-f8d79013\",\n  \"url\": \"https://buildright-dusky.vercel.app/dashboard\",\n  \"url_title\": \"Dashboard\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v2/visitor/log",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"visitor",
+								"log"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "End Session",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"visitorId\": \"visitor_12345\",\n  \"sessionId\": \"session_abcde_001\",\n  \"propertyId\": \"MR-f8d79013\",\n  \"pageViews\": 3,\n  \"clicks\": 7,\n  \"scrollDepth\": 100,\n  \"idleTime\": 20,\n  \"mouseMoves\": 30,\n  \"focusChanges\": 2,\n  \"honeypotTriggered\": false,\n  \"honeypotValue\": \"\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v2/visitor/session-end",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"visitor",
+								"session-end"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Dashboard",
+			"item": [
+				{
+					"name": "Summary",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"propertyId\": \"MR-f8d79013\",\n}"
+						},
+						"url": {
+							"raw": "{{host}}/api/v2/dashboard/summary?propertyId=MR-f8d79013",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"dashboard",
+								"summary"
+							],
+							"query": [
+								{
+									"key": "propertyId",
+									"value": "MR-f8d79013"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Domain",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v2/dashboard/domain?propertyId=MR-f8d79013",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"dashboard",
+								"domain"
+							],
+							"query": [
+								{
+									"key": "propertyId",
+									"value": "MR-f8d79013"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Metrics",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v2/dashboard/metrics?propertyId=MR-f8d79013",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"dashboard",
+								"metrics"
+							],
+							"query": [
+								{
+									"key": "propertyId",
+									"value": "MR-f8d79013"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Traffic Trends",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v2/dashboard/traffic/trends?propertyId=MR-f8d79013",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"dashboard",
+								"traffic",
+								"trends"
+							],
+							"query": [
+								{
+									"key": "propertyId",
+									"value": "MR-f8d79013"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Traffic Referrals",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v2/dashboard/traffic/referrals?propertyId=MR-f8d79013",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"dashboard",
+								"traffic",
+								"referrals"
+							],
+							"query": [
+								{
+									"key": "propertyId",
+									"value": "MR-f8d79013"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Visitor Country",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v2/dashboard/visitors/countries?propertyId=MR-f8d79013",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"dashboard",
+								"visitors",
+								"countries"
+							],
+							"query": [
+								{
+									"key": "propertyId",
+									"value": "MR-f8d79013"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Most Visited Page",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v2/dashboard/pages/most-visited?propertyId=MR-f8d79013",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"dashboard",
+								"pages",
+								"most-visited"
+							],
+							"query": [
+								{
+									"key": "propertyId",
+									"value": "MR-f8d79013"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Suspicious activities",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{host}}/api/v2/dashboard/security/suspicious-activities?propertyId=MR-f8d79013",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"dashboard",
+								"security",
+								"suspicious-activities"
+							],
+							"query": [
+								{
+									"key": "propertyId",
+									"value": "MR-f8d79013"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Traffic Analytics",
+			"item": [
+				{
+					"name": "Summary",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v2/traffic-analytics/traffic/summary?propertyId=MR-f8d79013",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"traffic-analytics",
+								"traffic",
+								"summary"
+							],
+							"query": [
+								{
+									"key": "propertyId",
+									"value": "MR-f8d79013"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Traffic Trends",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v2/traffic-analytics/traffic/trends?propertyId=MR-f8d79013",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"traffic-analytics",
+								"traffic",
+								"trends"
+							],
+							"query": [
+								{
+									"key": "propertyId",
+									"value": "MR-f8d79013"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Traffic Peak hours",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v2/traffic-analytics/traffic/peak-hours?propertyId=MR-f8d79013",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"traffic-analytics",
+								"traffic",
+								"peak-hours"
+							],
+							"query": [
+								{
+									"key": "propertyId",
+									"value": "MR-f8d79013"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Traffic Repeated Visits",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v2/traffic-analytics/traffic/repeated-visits?propertyId=MR-f8d79013",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"traffic-analytics",
+								"traffic",
+								"repeated-visits"
+							],
+							"query": [
+								{
+									"key": "propertyId",
+									"value": "MR-f8d79013"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Traffic Bounce Rate",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v2/traffic-analytics/traffic/bounce-rate?propertyId=MR-f8d79013",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"traffic-analytics",
+								"traffic",
+								"bounce-rate"
+							],
+							"query": [
+								{
+									"key": "propertyId",
+									"value": "MR-f8d79013"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Traffic User Types",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v2/traffic-analytics/traffic/user-types?propertyId=MR-f8d79013",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"traffic-analytics",
+								"traffic",
+								"user-types"
+							],
+							"query": [
+								{
+									"key": "propertyId",
+									"value": "MR-f8d79013"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Referral Domains",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/v2/traffic-analytics/traffic/referral-domains?propertyId=MR-f8d79013",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"v2",
+								"traffic-analytics",
+								"traffic",
+								"referral-domains"
+							],
+							"query": [
+								{
+									"key": "propertyId",
+									"value": "MR-f8d79013"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

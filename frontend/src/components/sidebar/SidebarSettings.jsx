@@ -2,7 +2,7 @@ import React from "react";
 import { useLocation } from "react-router-dom";
 import SidebarNavItem from "./SidebarNavItem";
 
-const SidebarSettings = ({ isCollapsed = false }) => {
+const SidebarSettings = ({ isCollapsed = false, isDomainActive }) => {
     const location = useLocation();
 
     return (
@@ -22,13 +22,23 @@ const SidebarSettings = ({ isCollapsed = false }) => {
                             path="/admin/profile"
                         />
                     ) : (
+                        // <SidebarNavItem
+                        //     icon=""
+                        //     text="Settings"
+                        //     isActive={location.pathname === "/user/profile"}
+                        //     isCollapsed={isCollapsed}
+                        //     path="/user/profile"
+                        // />
+
                         <SidebarNavItem
                             icon="https://cdn.builder.io/api/v1/image/assets/TEMP/07a0d539f713485c89d8da6a2747ca95b272ad66?placeholderIfAbsent=true&apiKey=a02d722199b0461aa7ba98c60ba9c66b"
-                            text="Settings"
-                            isActive={location.pathname === "/user/profile"}
+                            text={location.pathname.includes("admin") ? "Admin Settings" : "Settings"}
+                            isActive={location.pathname === (location.pathname.includes("admin") ? "/admin/profile" : "/user/profile")}
                             isCollapsed={isCollapsed}
-                            path="/user/profile"
+                            path={location.pathname.includes("admin") ? "/admin/profile" : "/user/profile"}
+                            disabled={!isDomainActive}
                         />
+
                     )
                 }
                 <SidebarNavItem
@@ -36,6 +46,7 @@ const SidebarSettings = ({ isCollapsed = false }) => {
                     text="Log Out"
                     isCollapsed={isCollapsed}
                     path="/login"
+                    disabled={false}
                 />
             </div>
         </section>

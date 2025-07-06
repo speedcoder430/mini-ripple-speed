@@ -6,6 +6,7 @@ const mockGaData = [
         bounceRate: '0.92',
         averageSessionDuration: '45',
         browser: 'Chrome',
+        device: 'Mobile',
         date: '2025-05-01',
     },
     {
@@ -13,6 +14,7 @@ const mockGaData = [
         bounceRate: '0.30',
         averageSessionDuration: '60',
         browser: 'Safari',
+        device: 'Desktop',
         date: '2025-05-02',
     },
     {
@@ -20,6 +22,7 @@ const mockGaData = [
         bounceRate: '0.40',
         averageSessionDuration: '400',
         browser: 'Edge',
+        device: 'Tablet',
         date: '2025-05-03',
     },
     {
@@ -27,6 +30,7 @@ const mockGaData = [
         bounceRate: '0.85',
         averageSessionDuration: '2',
         browser: 'Firefox',
+        device: 'Other',
         date: '2025-05-04',
     },
     {
@@ -34,11 +38,12 @@ const mockGaData = [
         bounceRate: '0.20',
         averageSessionDuration: '2000',
         browser: 'HeadlessChrome',
+        device: 'Desktop',
         date: '2025-05-05',
     },
 ];
 
-const BlockedCountryListTable = ({ gaData = mockGaData }) => {
+const BlockedCountryListTable = ({ gaData = mockGaData, blockedDevices = [] }) => {
     const [alerts, setAlerts] = useState([]);
 
     useEffect(() => {
@@ -78,15 +83,21 @@ const BlockedCountryListTable = ({ gaData = mockGaData }) => {
                 }
 
                 return {
-                    country: `Country-${index + 1}`, // Replace with actual country from IP if available
+                    device: row.device || 'Unknown',
                     reason,
                     date: row.date || 'Unknown',
                     status: 'Blocked',
                 };
             });
 
-        setAlerts(suspicious);
-    }, [gaData]);
+        // ✅ Apply device filter
+        const filteredAlerts =
+            blockedDevices.length === 0
+                ? suspicious
+                : suspicious.filter((a) => blockedDevices.includes(a.device));
+
+        setAlerts(filteredAlerts);
+    }, [gaData, blockedDevices]);
 
     return (
         <div className='w-full relative'>
@@ -94,7 +105,7 @@ const BlockedCountryListTable = ({ gaData = mockGaData }) => {
                 <table className='w-full text-left border-collapse'>
                     <thead className='sticky top-0 z-10 bg-red-100'>
                         <tr className='text-gray-700 text-sm'>
-                            <th className='p-3 px-6'>Blocked Countries</th>
+                            <th className='p-3 px-6'>Device</th>
                             <th className='p-3'>Reason for Blocking</th>
                         </tr>
                     </thead>
@@ -102,7 +113,7 @@ const BlockedCountryListTable = ({ gaData = mockGaData }) => {
                         {alerts.length > 0 ? (
                             alerts.map((item, idx) => (
                                 <tr key={idx} className='border-b hover:bg-gray-50 text-sm'>
-                                    <td className='p-3 px-6'>{item.country}</td>
+                                    <td className='p-3 px-6'>{item.device}</td>
                                     <td className='p-3'>{item.reason}</td>
                                 </tr>
                             ))

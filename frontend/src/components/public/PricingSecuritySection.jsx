@@ -44,7 +44,7 @@ const PricingSecuritySection = () => {
                     </div>
                 </div>
             </section>
-            <div className="absolute top-[-220px] md:top-[-160px] lg:top-[-260px] z-[20]">
+            <div className="absolute top-[-220px] md:top-[-160px] lg:top-[-260px]">
                 <div className="hidden w-full lg:block">
                     <svg xmlns="http://www.w3.org/2000/svg" width={width} height="1220" viewBox={`0 0 ${width} 1220`} fill="none">
                         <path d={`M${width} 0C1099.5 539.574 523.5 76.5275 0 343.265V1205.03C688.5 812.411 965 1509.48 ${width} 1066.39V0Z`} fill="#FAFAFA" fillOpacity="0.2" />
@@ -61,7 +61,7 @@ const PricingSecuritySection = () => {
                     </svg>
                 </div>
             </div>
-            <div className="absolute top-[-135px] md:top-[-90px] lg:top-[-180px] z-[20]">
+            <div className="absolute top-[-135px] md:top-[-90px] lg:top-[-180px]">
                 <div className="hidden w-full lg:block">
                     <svg xmlns="http://www.w3.org/2000/svg" width={width} height="1129" viewBox={`0 0 ${width} 1129`} fill="none">
                         <path d={`M${width} 0.5C1003.5 566.2 527 -32.5131 0 257.891V1083.78C685.5 631.667 965 1434.61 ${width} 987.537V0.5Z`} fill="#FAFAFA" />

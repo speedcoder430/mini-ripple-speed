@@ -2,14 +2,20 @@ import React, { forwardRef } from "react";
 import NotificationIcon from "./NotificationIcon";
 import { useLocation } from "react-router-dom";
 import UserProfile from "./UserProfile";
-
+import { auth } from "../../../firebase";
 const Topnav = forwardRef(({ title, onMenuClick }, ref) => {
     const location = useLocation();
     var user = localStorage.getItem("user") || "";
+    console.log(user)
+    // const user = JSON.parse(localStorage.getItem("user") || "{}");
     var userData = {};
     if (user) {
         userData = JSON.parse(user);
     }
+    const username = userData?.name || userData?.displayName ||"Unnamed";
+    console.log(username);
+    console.log(user);
+    
     var title = "";
     if (location.pathname === "/dashboard" || location.pathname === "/dashboard/") {
         title = "Dashboard Overview"
@@ -58,7 +64,7 @@ const Topnav = forwardRef(({ title, onMenuClick }, ref) => {
                     <NotificationIcon />
                     <UserProfile
                         avatarSrc={userData?.avatar || ""}
-                        userName={userData?.name || "Unnamed"}
+                        userName={username}
                         userRole={userData?.role || "User"}
                         dropdownIconSrc=""
                     />

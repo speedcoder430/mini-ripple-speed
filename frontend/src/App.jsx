@@ -21,7 +21,7 @@ import Tickets from "./pages/Admin/Tickets";
 import SystemLogs from "./pages/Admin/SystemLogs";
 import AdminProfile from "./pages/Admin/AdminProfile";
 
-
+import ProtectedRoute from "./middlewares/ProtectedRoute";
 const App = () => (
     <Router>
         <Routes>
@@ -30,7 +30,12 @@ const App = () => (
             <Route path="/support" element={<Support />} />
             <Route path="/register" element={<SignUp />} />
             <Route path="/login" element={<SignIn />} />
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/dashboard"
+                element={
+                    <ProtectedRoute>
+                        <Dashboard />
+                    </ProtectedRoute>
+                } />
             <Route path="/visitor-ip-management" element={<VisitorIPManagement />} />
             <Route path="/traffic-analytics" element={<TrafficAnalytics />} />
             <Route path="/security-threat-detection" element={<SecurityThreatDetection />} />

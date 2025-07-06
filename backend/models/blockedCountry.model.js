@@ -19,7 +19,9 @@ const blockedCountrySchema = new mongoose.Schema({
     minlength: 2,
     maxlength: 2,
   },
-  reason: String,
+  reason:  {
+    type: String
+  },
   blockedBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "user",
@@ -29,10 +31,8 @@ const blockedCountrySchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
+}, {
+  timestamps: true
 });
 
 // Unique per property + country combination

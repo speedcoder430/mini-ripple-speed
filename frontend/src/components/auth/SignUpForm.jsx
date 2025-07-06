@@ -4,11 +4,24 @@ import SocialLoginButton from "./SocialLoginButton";
 import SuccessModal from "./SuccessModal";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { createUserWithEmailAndPassword, updateProfile, getIdToken, } from "firebase/auth";
+import { auth, googleProvider, facebookProvider } from "../../../firebase";
+// const initialState = {
+//     email: "",
+//     password: "",
+// };
 
+import useSocialLogin from "../../helper/handleSocialLogin"
 const initialState = {
+    first_name: "",
+    last_name: "",
     email: "",
+    address: "",
     password: "",
+    confirmPassword: "",
+    agreedToTerms: false,
 };
+
 
 function reducer(state, action) {
     switch (action.type) {
@@ -16,6 +29,8 @@ function reducer(state, action) {
             return { ...state, [action.name]: action.value };
         case "TOGGLE_TERMS":
             return { ...state, agreedToTerms: !state.agreedToTerms };
+        // case "RESET":
+        //     return initialState;
         case "RESET":
             return initialState;
         default:
@@ -24,6 +39,7 @@ function reducer(state, action) {
 }
 
 function SignUpForm() {
+    const { handleSocialLogin } = useSocialLogin();
     const [formData, dispatch] = useReducer(reducer, initialState);
     const [signupSuccess, setSignupSuccess] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
@@ -70,26 +86,63 @@ function SignUpForm() {
         if (!validateForm()) return;
 
         try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/users/signup`, {
+            // Step 1: Firebase Auth
+            const userCredential = await createUserWithEmailAndPassword(
+                auth,
+                formData.email,
+                formData.password,
+            );
+            const user = userCredential.user;
+            console.log(user);
+
+
+
+            const fullName = `${formData.first_name} ${formData.last_name}`;
+            await updateProfile(user, { displayName: fullName });
+
+            // Step 3: Get Firebase ID Token
+            await user.reload(); // Still good to reload
+            const idToken = await user.getIdToken();
+
+            // Step 4: Send ID token to your backend for user creation
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/users/verify-token`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(formData),
+                body: JSON.stringify({ idToken }),
             });
 
             const data = await res.json();
-
+            console.log(data);
             if (res.ok) {
                 toast.success("Account created successfully!");
-                console.log("respnose :", res);
                 localStorage.setItem("token", data?.token);
                 localStorage.setItem("user", JSON.stringify(data?.user));
                 setSignupSuccess(true);
             } else {
                 toast.error(data.error || "Signup failed.");
             }
-        } catch {
-            toast.error("Something went wrong. Please try again.");
+        } catch (error) {
+            toast.error(error.message || "Something went wrong.");
         }
+    };
+
+
+    const handleSignInwithGoogle = async () => {
+        handleSocialLogin(
+            googleProvider,
+            `${import.meta.env.VITE_API_URL}/api/v1/users/google`,
+            "Logged in with Google!"
+        );
+    };
+
+
+    const handleFacebookLogin = async () => {
+
+        handleSocialLogin(
+            facebookProvider,
+            `${import.meta.env.VITE_API_URL}/api/v1/users/facebook`,
+            "Logged in with Google!"
+        );
     };
 
     return (
@@ -227,8 +280,8 @@ function SignUpForm() {
                         </div>
 
                         <div className="flex flex-wrap gap-6 items-start self-center mt-8 text-base text-zinc-600 max-md:max-w-full">
-                            <SocialLoginButton icon="/auth/auth-8.svg" text="Google" />
-                            <SocialLoginButton icon="/auth/auth-9.svg" text="Facebook" />
+                            <SocialLoginButton login={() => handleSignInwithGoogle()} icon="/auth/auth-8.svg" text="Google" />
+                            <SocialLoginButton login={() => handleFacebookLogin()} icon="/auth/auth-9.svg" text="Facebook" />
                             <SocialLoginButton icon="/auth/auth-10.svg" text="X (Twitter)" />
 
                         </div>

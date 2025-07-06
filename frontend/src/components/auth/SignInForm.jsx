@@ -1,9 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import InputField from "./InputField";
 import SocialLoginButton from "./SocialLoginButton";
 import SuccessModal from "./SuccessModal";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { redirectToStripeCheckout } from "../../helper/useStripeCheckout"
+
+import { auth, googleProvider, facebookProvider } from "../../../firebase";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
+import useSocialLogin from "../../helper/handleSocialLogin"
 
 function SignInForm() {
     const [formData, setFormData] = useState({
@@ -13,9 +19,11 @@ function SignInForm() {
         // provider_id: "",
     });
 
+    const { handleSocialLogin } = useSocialLogin();
     const [showPassword, setShowPassword] = useState(false);
     const [stayLoggedIn, setStayLoggedIn] = useState(false);
     const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const navigate = useNavigate();
 
     const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
 
@@ -46,30 +54,80 @@ function SignInForm() {
         return true;
     };
 
+    // SignIn.jsx
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!validateForm()) return;
 
         try {
-            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/users/login`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ ...formData, stayLoggedIn }),
-            });
+            // Firebase login
+            const userCredential = await signInWithEmailAndPassword(
+                auth,
+                formData.email,
+                formData.password
+            );
+            const user = userCredential.user;
+
+            // Get Firebase ID token
+            const idToken = await user.getIdToken();
+            console.log("Firebase ID Token:", idToken);
+
+            // Send token to backend
+            const res = await fetch(
+                `${import.meta.env.VITE_API_URL}/api/v1/users/verify-token`,
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ idToken }),
+                }
+            );
 
             const data = await res.json();
-            if (res.ok) {
-                toast.success("Logged in successfully!");
-                localStorage.setItem("token", data?.token);
-                localStorage.setItem("user", JSON.stringify(data?.user));
-                setIsLoggedIn(true);
-            } else {
+            console.log("Backend response:", data);
+
+            if (!res.ok) {
                 toast.error(data.error || "Login failed.");
+                return;
             }
-        } catch {
-            toast.error("Something went wrong. Please try again.");
+
+            toast.success("Logged in successfully!");
+            localStorage.setItem("token", data.token);
+            setIsLoggedIn(true);
+
+            // ✅ Check for saved planId
+            const selectedPlanId = localStorage.getItem("selectedPlanId");
+
+            if (selectedPlanId) {
+                console.log("🔥 Redirecting to checkout with plan:", selectedPlanId);
+                await redirectToStripeCheckout({ planId: selectedPlanId, user });
+                localStorage.removeItem("selectedPlanId");
+                return;
+            }
+
+            // 🟢 Only go to dashboard if no checkout is needed
+            navigate("/dashboard");
+
+        } catch (error) {
+            toast.error(error.message || "Something went wrong. Please try again.");
         }
     };
+    const handleSignInwithGoogle = async () => {
+        handleSocialLogin(
+            googleProvider,
+            `${import.meta.env.VITE_API_URL}/api/v1/users/google`,
+            "Logged in with Google!"
+        );
+    };
+
+
+    const handleFacebookLogin = async () => {
+        handleSocialLogin(
+            facebookProvider,
+            `${import.meta.env.VITE_API_URL}/api/v1/users/facebook`,
+            "Logged in with Facebook!"
+        );
+    };
+
 
     return (
         <>
@@ -187,8 +245,8 @@ function SignInForm() {
                         </div>
 
                         <div className="flex flex-wrap gap-6 items-start self-center mt-8 text-base text-zinc-600 max-md:max-w-full">
-                            <SocialLoginButton icon="/auth/auth-8.svg" text="Google" />
-                            <SocialLoginButton icon="/auth/auth-9.svg" text="Facebook" />
+                            <SocialLoginButton login={() => handleSignInwithGoogle()} icon="/auth/auth-8.svg" text="Google" />
+                            <SocialLoginButton login={() => handleFacebookLogin()} icon="/auth/auth-9.svg" text="Facebook" />
                             <SocialLoginButton icon="/auth/auth-10.svg" text="X (Twitter)" />
 
                         </div>

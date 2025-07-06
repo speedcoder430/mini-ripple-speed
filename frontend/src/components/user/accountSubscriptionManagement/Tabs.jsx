@@ -21,7 +21,7 @@ function Tabs() {
             role="tablist"
             aria-label="Account settings tabs"
         >
-            {tabs.map((tab, index) => (
+            {/* {tabs.map((tab, index) => (
                 <TabItem
                     key={index}
                     label={tab.label}
@@ -29,7 +29,7 @@ function Tabs() {
                     onClick={() => handleTabClick(index)}
                     className={tab.className}
                 />
-            ))}
+            ))} */}
         </nav>
     );
 }

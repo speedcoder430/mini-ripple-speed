@@ -39,54 +39,14 @@ const mockGaData = [
   ];
   
 
-const SuspiciousActivityAlertsTable = ({ gaData = mockGaData }) => {
+const SuspiciousActivityAlertsTable = ({ gaData = [] }) => {
     const [alerts, setAlerts] = useState([]);
 
     useEffect(() => {
         if (!Array.isArray(gaData)) return;
 
-        const suspicious = gaData
-            .filter((row) => {
-                const bounce = parseFloat(row.bounceRate);
-                const duration = parseFloat(row.averageSessionDuration);
-                const browser = row.browser?.toLowerCase() || '';
-                const path = row.pagePath?.toLowerCase() || '';
-
-                return (
-                    bounce >= 0.9 ||
-                    duration <= 3 ||
-                    duration >= 1800 ||
-                    browser.includes('headless') ||
-                    path.includes('/api') ||
-                    path.includes('/admin')
-                );
-            })
-            .map((row, index) => {
-                let reason = 'Unusual Behavior';
-
-                if ((row.browser || '').toLowerCase().includes('headless')) {
-                    reason = 'Bot Access';
-                } else if (parseFloat(row.bounceRate) >= 0.9) {
-                    reason = 'High Bounce Rate';
-                } else if (parseFloat(row.averageSessionDuration) <= 3) {
-                    reason = 'Very Short Visit';
-                } else if (parseFloat(row.averageSessionDuration) >= 1800) {
-                    reason = 'Suspicious Long Visit';
-                } else if ((row.pagePath || '').toLowerCase().includes('/api')) {
-                    reason = 'API Endpoint Visit';
-                } else if ((row.pagePath || '').toLowerCase().includes('/admin')) {
-                    reason = 'Admin Page Visit';
-                }
-
-                return {
-                    ip: `Unknown-${index + 1}`,
-                    type: reason,
-                    date: row.date || 'Unknown',
-                    status: 'Flagged',
-                };
-            });
-
-        setAlerts(suspicious);
+        // If data already contains alerts, assume it's real
+        setAlerts(gaData);
     }, [gaData]);
 
     return (
@@ -126,5 +86,6 @@ const SuspiciousActivityAlertsTable = ({ gaData = mockGaData }) => {
         </div>
     );
 };
+
 
 export default SuspiciousActivityAlertsTable;

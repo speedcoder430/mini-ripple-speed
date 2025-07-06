@@ -1,15 +1,19 @@
-import React, { useState, forwardRef } from "react";
+import React, { useState, forwardRef, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import SidebarLogo from "./SidebarLogo";
 import SidebarNavItem from "./SidebarNavItem";
 import SidebarSettings from "./SidebarSettings";
-
+import { useAuth } from "@/middlewares/authContext";
+import { useDomainStatus } from "@/helper/useDomainStatus";
 const Sidebar = forwardRef(({ isOpen, setIsOpen }, ref) => {
     const location = useLocation();
+    const { user } = useAuth();
     const [isCollapsed, setIsCollapsed] = useState(() => {
         const storedValue = localStorage.getItem("sidebarCollapsed");
         return storedValue === "true"; // default to false if not found
     });
+    const { isConnected: isDomainActive, status } = useDomainStatus();
+
 
     const toggleSidebar = () => {
         const newState = !isCollapsed;
@@ -18,8 +22,17 @@ const Sidebar = forwardRef(({ isOpen, setIsOpen }, ref) => {
     };
 
     const handleNavClick = () => {
+        if (!isDomainActive) return;
+        navigate(path);
         setIsOpen(false);
     }
+
+    const alwaysAccessiblePaths = [
+        "/account-subscription",
+        "/login",
+        "/user/profile",
+        "/admin/profile",
+    ];
 
     const userNavigationItems = [
         {
@@ -102,13 +115,25 @@ const Sidebar = forwardRef(({ isOpen, setIsOpen }, ref) => {
                             key={index}
                             {...item}
                             isCollapsed={isCollapsed}
-                            isActive={location.pathname === item.path || location.pathname === `${item.path}/`}
+                            isActive={
+                                location.pathname === item.path ||
+                                location.pathname === `${item.path}/`
+                            }
                             path={item.path}
+                            disabled={!isDomainActive && !alwaysAccessiblePaths.includes(item.path)}
                             onClick={handleNavClick}
                         />
+
                     ))}
                 </nav>
-                <SidebarSettings isCollapsed={isCollapsed} />
+                {status !== "active" && (
+                    <div className="text-center mt-4 px-4 text-sm text-yellow-400">
+                        🔒 Please connect your domain to unlock all features.
+                    </div>
+                )}
+
+
+                <SidebarSettings  isCollapsed={isCollapsed} isDomainActive={isDomainActive}  />
             </div>
         </aside>
     );

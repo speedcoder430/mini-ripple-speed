@@ -217,6 +217,177 @@ const router = express.Router();
  *       500:
  *         description: Internal server error while fetching user data
  */
+/**
+ * @swagger
+ * /api/v1/users/facebook:
+ *   post:
+ *     tags: [Auth]
+ *     summary: Facebook authentication
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               idToken:
+ *                 type: string
+ *                 description: Facebook access token
+ *                 example: "EAAJZCZB..."
+ *     responses:
+ *       200:
+ *         description: User authenticated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   description: JWT token for the authenticated user
+ *                   example: "eyJhbGciOiJIUzI1NiIsInR..."
+ *       400:
+ *         description: Invalid or missing access token
+ *       401:
+ *         description: Unauthorized - Facebook token invalid or expired
+ *       500:
+ *         description: Authentication failed
+ */
+/**
+ * @swagger
+ * /api/v1/users/facebook:
+ *   post:
+ *     tags: [Auth]
+ *     summary: Facebook authentication
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               idToken:
+ *                 type: string
+ *                 description: Facebook access token
+ *                 example: "EAAJZCZB..."
+ *     responses:
+ *       200:
+ *         description: User authenticated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   description: JWT token for the authenticated user
+ *                   example: "eyJhbGciOiJIUzI1NiIsInR..."
+ *       400:
+ *         description: Invalid or missing access token
+ *       401:
+ *         description: Unauthorized - Facebook token invalid or expired
+ *       500:
+ *         description: Authentication failed
+ */
+/**
+ * @swagger
+ * /api/v1/users/facebook:
+ *   post:
+ *     summary: Authenticate or register user via Facebook OAuth using Firebase ID token
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - idToken
+ *             properties:
+ *               idToken:
+ *                 type: string
+ *                 description: Firebase ID token obtained from Facebook sign-in
+ *                 example: eyJhbGciOiJSUzI1NiIsImtpZCI6IjM1OD...
+ *     responses:
+ *       200:
+ *         description: User authenticated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   description: Custom JWT token from backend
+ *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: string
+ *                       example: 60a4f509e4b0c80017ddc102
+ *                     email:
+ *                       type: string
+ *                       example: user@facebook.com
+ *                     name:
+ *                       type: string
+ *                       example: John Doe
+ *                     photo:
+ *                       type: string
+ *                       example: https://example.com/photo.jpg
+ *                     isEmailVerified:
+ *                       type: boolean
+ *                       example: true
+ *       400:
+ *         description: Missing or invalid Firebase ID token
+ *       401:
+ *         description: Unauthorized – Facebook token is invalid or expired
+ *       500:
+ *         description: Internal server error – Authentication failed
+ */
+/**
+ * @swagger
+ * /api/v1/users/verify-token:
+ *   post:
+ *     tags: [Auth]
+ *     summary: Verify Firebase ID token
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - idToken
+ *             properties:
+ *               idToken:
+ *                 type: string
+ *                 description: Firebase ID token to verify
+ *                 example: eyJhbGciOiJSUzI1NiIsImtpZCI6IjM1OD...
+ *     responses:
+ *       200:
+ *         description: Token is valid
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 uid:
+ *                   type: string
+ *                   description: Firebase user UID
+ *                   example: "abc123uid"
+ *                 email:
+ *                   type: string
+ *                   example: "user@example.com"
+ *                 name:
+ *                   type: string
+ *                   example: "John Doe"
+ *       401:
+ *         description: Invalid or expired token
+ *       500:
+ *         description: Internal server error during token verification
+ */
+
 const {
   signup,
   signin,
@@ -226,6 +397,8 @@ const {
   googleAuth,
   googleOAuthCallback,
   getUserData,
+  facebookAuth,
+  verifyFirebaseToken
 } = require("../controllers/auth");
 
 // Email/Password authentication routes
@@ -239,5 +412,10 @@ router.get("/verify-email", verifyEmail);
 router.post("/google", googleAuth);
 router.get("/callback", googleOAuthCallback);
 router.get("/get-user-data", getUserData);
+
+// Facebook authentication route
+router.post("/facebook", facebookAuth);
+router.post("/verify-token", verifyFirebaseToken);
+
 
 module.exports = router;
